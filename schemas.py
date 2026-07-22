@@ -40,6 +40,13 @@ class BookSchema(BookBaseSchema):
         from_attributes = True
 
 
+class PaginatedBooksSchema(BaseModel):
+    items: list[BookSchema]
+    total: int
+    skip: int
+    limit: int
+
+
 class BookCreateSchema(BookBaseSchema):
     author_id: int
     pass

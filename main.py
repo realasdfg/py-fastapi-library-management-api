@@ -3,7 +3,14 @@ from sqlalchemy.exc import IntegrityError
 
 import crud
 from database import SessionDep
-from schemas import AuthorCreateSchema, AuthorSchema, PaginatedAuthorsSchema
+from schemas import (
+    AuthorCreateSchema,
+    AuthorSchema,
+    BookCreateSchema,
+    BookSchema,
+    PaginatedAuthorsSchema,
+    PaginatedBooksSchema,
+)
 
 app = FastAPI()
 
@@ -24,7 +31,7 @@ def get_all_authors(
     )
 
 
-@app.get("/authors/{author_id}")
+@app.get("/authors/{author_id}/")
 def get_author(author_id: int, session: SessionDep) -> AuthorSchema:
     author = crud.get_author_by_id(session=session, author_id=author_id)
     if author is None:
@@ -41,3 +48,26 @@ def add_author(author_data: AuthorCreateSchema, session: SessionDep) -> AuthorSc
             status_code=400, detail="Author with this name already exists"
         )
     return AuthorSchema.model_validate(author)
+
+
+@app.post("/books/")
+def add_book(book_data: BookCreateSchema, session: SessionDep) -> BookSchema:
+    book = crud.create_book(session=session, data=book_data)
+    return BookSchema.model_validate(book)
+
+
+@app.get("/books/")
+def get_all_books(
+    session: SessionDep,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1, le=100),
+    author_id: int = Query(None, alias="author_id"),
+) -> PaginatedBooksSchema:
+    books = crud.get_all_books(session, skip=skip, limit=limit, author_id=author_id)
+    total = crud.count_books(session=session, author_id=author_id)
+    return PaginatedBooksSchema(
+        items=[BookSchema.model_validate(book) for book in books],
+        total=total,
+        skip=skip,
+        limit=limit,
+    )
