@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Query
 from sqlalchemy.exc import IntegrityError
 
 import crud
-from database import SessionDep
+from database import Base, SessionDep, engine
 from schemas import (
     AuthorCreateSchema,
     AuthorSchema,
@@ -12,6 +12,7 @@ from schemas import (
     PaginatedBooksSchema,
 )
 
+Base.metadata.create_all(engine)
 app = FastAPI()
 
 
@@ -61,7 +62,7 @@ def get_all_books(
     session: SessionDep,
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1, le=100),
-    author_id: int = Query(None, alias="author_id"),
+    author_id: int | None = Query(None, alias="author_id"),
 ) -> PaginatedBooksSchema:
     books = crud.get_all_books(session, skip=skip, limit=limit, author_id=author_id)
     total = crud.count_books(session=session, author_id=author_id)
