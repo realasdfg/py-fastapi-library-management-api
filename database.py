@@ -5,10 +5,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session
 
-SQLITE_FILE_NAME = "database.db"
-SQLITE_URL = f"sqlite:///{SQLITE_FILE_NAME}"
+SQLITE_URL = "sqlite:///./db.sqlite3"
 
-engine = create_engine(SQLITE_URL, check_same_thread=False)
+engine = create_engine(SQLITE_URL)
 
 Base = declarative_base()
 
