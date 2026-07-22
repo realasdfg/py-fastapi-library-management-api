@@ -15,6 +15,13 @@ class AuthorSchema(AuthorBaseSchema):
         from_attributes = True
 
 
+class PaginatedAuthorsSchema(BaseModel):
+    items: list[AuthorSchema]
+    total: int
+    skip: int
+    limit: int
+
+
 class AuthorCreateSchema(AuthorBaseSchema):
     pass
 
